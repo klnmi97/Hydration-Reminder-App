@@ -14,7 +14,7 @@ import com.firebase.jobdispatcher.Trigger;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by mihae on 09/08/2018.
+ * Created by Michael Klunko on 09/08/2018.
  */
 
 public class ReminderUtilities {
