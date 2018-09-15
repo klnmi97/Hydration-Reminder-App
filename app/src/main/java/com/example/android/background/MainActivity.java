@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements
     private Toast mToast;
     IntentFilter mChargingIntentFilter;
     ChargingBroadcastReceiver mChargingReceiver;
+    BatteryManager batteryManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements
         mChargingIntentFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
 
         mChargingReceiver = new ChargingBroadcastReceiver();
+
+        batteryManager = (BatteryManager) getSystemService(BATTERY_SERVICE);
 
     }
 
@@ -118,6 +123,17 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            boolean isCharging = batteryManager.isCharging();
+            showCharging(isCharging);
+        } else {
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = this.registerReceiver(null, ifilter);
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                   status == BatteryManager.BATTERY_STATUS_FULL;
+            showCharging(isCharging);
+        }
         registerReceiver(mChargingReceiver, mChargingIntentFilter);
     }
 
